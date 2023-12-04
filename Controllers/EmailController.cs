@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using pkaselj_lab_07_.Models;
-using pkaselj_lab_07_.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using pkaselj_lab_07_.Filters;
 using pkaselj_lab_07_.Controllers.DTOs;
+using pkaselj_lab_07_.Repositories;
 
 namespace pkaselj_lab_07_.Controllers
 {
@@ -15,9 +15,9 @@ namespace pkaselj_lab_07_.Controllers
     [Route("api/[controller]")]
     public class EmailController : ControllerBase
     {
-        private readonly EmailRepository emailRepository;
+        private readonly IEmailRepository emailRepository;
 
-        public EmailController(EmailRepository emailRepository)
+        public EmailController(IEmailRepository emailRepository)
         {
             this.emailRepository = emailRepository;
         }

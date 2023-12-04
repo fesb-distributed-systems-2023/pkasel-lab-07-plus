@@ -1,4 +1,6 @@
 using pkaselj_lab_07_.Repositories;
+using pkaselj_lab_07_.Repositories.InMemory;
+using pkaselj_lab_07_.Repositories.PlainText;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<EmailRepository>();
+builder.Services.AddSingleton<IEmailRepository, EmailRepository_PlainFile>();
 
 var app = builder.Build();
 
