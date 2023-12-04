@@ -1,6 +1,4 @@
 using pkaselj_lab_07_.Repositories;
-using pkaselj_lab_07_.Repositories.InMemory;
-using pkaselj_lab_07_.Repositories.PlainText;
 
 var builder = WebApplication.CreateBuilder(args);
 

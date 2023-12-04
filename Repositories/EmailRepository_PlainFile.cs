@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace pkaselj_lab_07_.Repositories.PlainText
+namespace pkaselj_lab_07_.Repositories
 {
     public class EmailRepository_PlainFile : IEmailRepository
     {

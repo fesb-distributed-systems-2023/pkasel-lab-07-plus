@@ -2,11 +2,11 @@
 
 namespace pkaselj_lab_07_.Repositories
 {
-    public class EmailRepository
+    public class EmailRepository_InMemory : IEmailRepository
     {
         private List<Email> emails;
 
-        public EmailRepository()
+        public EmailRepository_InMemory()
         {
             emails = new List<Email>();
         }
@@ -66,17 +66,10 @@ namespace pkaselj_lab_07_.Repositories
             }
         }
 
-
-        public Email? GetEmailBySubject(string subject)
-        {
-            return emails.FirstOrDefault(e => e.Subject == subject);
-        }
-
-
         private void ValidateEmail(Email email)
         {
             if (string.IsNullOrEmpty(email.Subject) ||
-                string.IsNullOrEmpty(email.Sender)  ||
+                string.IsNullOrEmpty(email.Sender) ||
                 string.IsNullOrEmpty(email.Receiver))
             {
                 throw new ArgumentException("Email fields cannot be null or empty.");
