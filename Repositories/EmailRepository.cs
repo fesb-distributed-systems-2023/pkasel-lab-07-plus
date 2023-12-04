@@ -13,6 +13,9 @@ namespace pkaselj_lab_07_.Repositories
 
         public void AddEmail(Email email)
         {
+            ValidateEmail(email);
+            email.ID = Guid.NewGuid().GetHashCode();
+            email.Timestamp = DateTime.UtcNow;
             emails.Add(email);
         }
 
@@ -28,6 +31,9 @@ namespace pkaselj_lab_07_.Repositories
 
         public void UpdateEmail(int id, Email updatedEmail)
         {
+            ValidateEmail(updatedEmail);
+
+            // Perform access control here if needed
 
             Email? existingEmail = GetEmailById(id);
             if (existingEmail is not null)
@@ -47,6 +53,8 @@ namespace pkaselj_lab_07_.Repositories
 
         public void DeleteEmail(int id)
         {
+            // Perform access control here if needed
+
             Email? emailToRemove = GetEmailById(id);
             if (emailToRemove != null)
             {
@@ -62,6 +70,18 @@ namespace pkaselj_lab_07_.Repositories
         public Email? GetEmailBySubject(string subject)
         {
             return emails.FirstOrDefault(e => e.Subject == subject);
+        }
+
+
+        private void ValidateEmail(Email email)
+        {
+            if (string.IsNullOrEmpty(email.Subject) ||
+                string.IsNullOrEmpty(email.Sender)  ||
+                string.IsNullOrEmpty(email.Receiver))
+            {
+                throw new ArgumentException("Email fields cannot be null or empty.");
+            }
+
         }
     }
 }
