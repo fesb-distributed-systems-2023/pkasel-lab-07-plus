@@ -37,27 +37,149 @@ namespace pkaselj_lab_07_.Repositories
 
         public void DeleteEmail(int id)
         {
-            throw new NotImplementedException();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @"
+                DELETE FROM Emails
+                WHERE ID == $id";
+
+            command.Parameters.AddWithValue("$id", id);
+
+            int rowsAffected = command.ExecuteNonQuery();
+
+            if (rowsAffected < 1)
+            {
+                throw new ArgumentException($"No emails with ID = {id}.");
+            }
         }
 
         public List<Email> GetAllEmails()
         {
-            throw new NotImplementedException();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @"SELECT ID, Subject, Body, Sender, Receiver, Timestamp FROM Emails";
+
+            using var reader = command.ExecuteReader();
+
+            var results = new List<Email>();
+            while(reader.Read())
+            {
+
+                var row = new Email
+                {
+                    ID = reader.GetInt32(0),
+                    Subject = reader.GetString(1),
+                    Body = reader.GetString(2),
+                    Sender = reader.GetString(3),
+                    Receiver = reader.GetString(4),
+                    Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
+                };
+
+                results.Add(row);
+            }
+
+            return results;
         }
 
         public Email? GetEmailById(int id)
         {
-            throw new NotImplementedException();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @"SELECT ID, Subject, Body, Sender, Receiver, Timestamp FROM Emails WHERE ID == $id";
+
+            command.Parameters.AddWithValue("$id", id);
+
+            using var reader = command.ExecuteReader();
+
+            Email result = null;
+
+            if (reader.Read())
+            {
+                result = new Email
+                {
+                    ID = reader.GetInt32(0),
+                    Subject = reader.GetString(1),
+                    Body = reader.GetString(2),
+                    Sender = reader.GetString(3),
+                    Receiver = reader.GetString(4),
+                    Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
+                };
+            }
+
+            return result;
         }
 
         public Email? GetEmailBySubject(string subject)
         {
-            throw new NotImplementedException();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @"SELECT ID, Subject, Body, Sender, Receiver, Timestamo FROM Emails WHERE Subject == $subject";
+
+            command.Parameters.AddWithValue("$subject", subject);
+
+            using var reader = command.ExecuteReader();
+
+            Email result = null;
+
+            if (reader.Read())
+            {
+                result = new Email
+                {
+                    ID = reader.GetInt32(0),
+                    Subject = reader.GetString(1),
+                    Body = reader.GetString(2),
+                    Sender = reader.GetString(3),
+                    Receiver = reader.GetString(4),
+                    Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
+                };
+            }
+
+            return result;
         }
 
         public void UpdateEmail(int id, Email updatedEmail)
         {
-            throw new NotImplementedException();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @"
+                UPDATE Emails
+                SET
+                    Subject = $subject,
+                    Body = $body,
+                    Sender = $sender,
+                    Receiver = $receiver,
+                    Timestamp = $timestamp
+                WHERE
+                    ID == $id";
+
+            command.Parameters.AddWithValue("$id", id);
+            command.Parameters.AddWithValue("$subject", updatedEmail.Subject);
+            command.Parameters.AddWithValue("$body", updatedEmail.Body);
+            command.Parameters.AddWithValue("$sender", updatedEmail.Sender);
+            command.Parameters.AddWithValue("$receiver", updatedEmail.Receiver);
+            command.Parameters.AddWithValue("$timestamp", updatedEmail.Timestamp.ToString(_dbDatetimeFormat));
+
+            int rowsAffected = command.ExecuteNonQuery();
+
+            if (rowsAffected < 1)
+            {
+                throw new ArgumentException($"Could not update email with ID = {id}.");
+            }
         }
     }
 }
