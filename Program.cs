@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IEmailRepository, EmailRepository>();
+builder.Services.AddSingleton<IEmailRepository, EmailRepository_SQL>();
 
 var app = builder.Build();
 
