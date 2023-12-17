@@ -12,9 +12,9 @@ namespace pkaselj_lab_07_.Controllers
     [Route("api/[controller]")]
     public class EmailController : ControllerBase
     {
-        private readonly EmailRepository emailRepository;
+        private readonly IEmailRepository emailRepository;
 
-        public EmailController(EmailRepository emailRepository)
+        public EmailController(IEmailRepository emailRepository)
         {
             this.emailRepository = emailRepository;
         }

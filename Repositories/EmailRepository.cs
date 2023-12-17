@@ -2,7 +2,8 @@
 
 namespace pkaselj_lab_07_.Repositories
 {
-    public class EmailRepository
+    // Right click on class name (EmailRepository) > Quick Actions and Refactorings > Extract Interface
+    public class EmailRepository : IEmailRepository
     {
         private List<Email> emails;
 
