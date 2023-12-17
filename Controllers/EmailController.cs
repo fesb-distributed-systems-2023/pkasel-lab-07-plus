@@ -34,7 +34,7 @@ namespace pkaselj_lab_07_.Controllers
             var email = emailRepository.GetEmailById(id);
             if (email == null)
             {
-                return NotFound();
+                return NotFound($"Email with ID {id} not found.");
             }
 
             return Ok(email);
@@ -45,7 +45,7 @@ namespace pkaselj_lab_07_.Controllers
         {
             if (email == null)
             {
-                return BadRequest();
+                return BadRequest($"Wrong email format!");
             }
 
             emailRepository.AddEmail(email);
@@ -58,13 +58,13 @@ namespace pkaselj_lab_07_.Controllers
         {
             if (updatedEmail == null)
             {
-                return BadRequest();
+                return BadRequest($"Wrong email format!");
             }
 
             var existingEmail = emailRepository.GetEmailById(id);
             if (existingEmail == null)
             {
-                return NotFound();
+                return NotFound($"Email with ID {id} not found.");
             }
 
             emailRepository.UpdateEmail(id, updatedEmail);
@@ -78,7 +78,7 @@ namespace pkaselj_lab_07_.Controllers
             var email = emailRepository.GetEmailById(id);
             if (email == null)
             {
-                return NotFound();
+                return NotFound($"Email with ID {id} not found.");
             }
 
             emailRepository.DeleteEmail(id);
