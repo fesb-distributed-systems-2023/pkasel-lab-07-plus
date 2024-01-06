@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using pkaselj_lab_07_.Controllers.DTO;
 using pkaselj_lab_07_.Filters;
 using pkaselj_lab_07_.Models;
 using pkaselj_lab_07_.Repositories;
@@ -22,14 +23,14 @@ namespace pkaselj_lab_07_.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Email>> Get()
+        public ActionResult<IEnumerable<EmailInfoDTO>> Get()
         {
-            var allEmails = emailRepository.GetAllEmails();
+            var allEmails = emailRepository.GetAllEmails().Select(x => EmailInfoDTO.FromModel(x));
             return Ok(allEmails);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Email> Get(int id)
+        public ActionResult<EmailInfoDTO> Get(int id)
         {
             var email = emailRepository.GetEmailById(id);
             if (email == null)
@@ -37,24 +38,24 @@ namespace pkaselj_lab_07_.Controllers
                 return NotFound($"Email with ID {id} not found.");
             }
 
-            return Ok(email);
+            return Ok( EmailInfoDTO.FromModel(email) );
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody] Email email)
+        public ActionResult Post([FromBody] NewEmailDTO email)
         {
             if (email == null)
             {
                 return BadRequest($"Wrong email format!");
             }
 
-            emailRepository.AddEmail(email);
+            emailRepository.AddEmail( email.ToModel() );
 
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] Email updatedEmail)
+        public ActionResult Put(int id, [FromBody] NewEmailDTO updatedEmail)
         {
             if (updatedEmail == null)
             {
@@ -67,7 +68,7 @@ namespace pkaselj_lab_07_.Controllers
                 return NotFound($"Email with ID {id} not found.");
             }
 
-            emailRepository.UpdateEmail(id, updatedEmail);
+            emailRepository.UpdateEmail( id, updatedEmail.ToModel() );
 
             return Ok();
         }
