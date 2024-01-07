@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using pkaselj_lab_07_.Controllers.DTO;
 using pkaselj_lab_07_.Filters;
+using pkaselj_lab_07_.Logic;
 using pkaselj_lab_07_.Models;
 using pkaselj_lab_07_.Repositories;
 using System;
@@ -15,24 +16,24 @@ namespace pkaselj_lab_07_.Controllers
     [Route("api/[controller]")]
     public class EmailController : ControllerBase
     {
-        private readonly IEmailRepository emailRepository;
+        private readonly IEmailLogic _emailLogic;
 
-        public EmailController(IEmailRepository emailRepository)
+        public EmailController(IEmailLogic emailLogic)
         {
-            this.emailRepository = emailRepository;
+            this._emailLogic = emailLogic;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<EmailInfoDTO>> Get()
         {
-            var allEmails = emailRepository.GetAllEmails().Select(x => EmailInfoDTO.FromModel(x));
+            var allEmails = _emailLogic.GetEmails().Select(x => EmailInfoDTO.FromModel(x));
             return Ok(allEmails);
         }
 
         [HttpGet("{id}")]
         public ActionResult<EmailInfoDTO> Get(int id)
         {
-            var email = emailRepository.GetEmailById(id);
+            var email = _emailLogic.GetEmail(id);
             if (email == null)
             {
                 return NotFound($"Email with ID {id} not found.");
@@ -49,7 +50,7 @@ namespace pkaselj_lab_07_.Controllers
                 return BadRequest($"Wrong email format!");
             }
 
-            emailRepository.AddEmail( email.ToModel() );
+            _emailLogic.CreateNewEmail( email.ToModel() );
 
             return Ok();
         }
@@ -62,13 +63,13 @@ namespace pkaselj_lab_07_.Controllers
                 return BadRequest($"Wrong email format!");
             }
 
-            var existingEmail = emailRepository.GetEmailById(id);
+            var existingEmail = _emailLogic.GetEmail(id);
             if (existingEmail == null)
             {
                 return NotFound($"Email with ID {id} not found.");
             }
 
-            emailRepository.UpdateEmail( id, updatedEmail.ToModel() );
+            _emailLogic.UpdateEmail( id, updatedEmail.ToModel() );
 
             return Ok();
         }
@@ -76,13 +77,13 @@ namespace pkaselj_lab_07_.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            var email = emailRepository.GetEmailById(id);
+            var email = _emailLogic.GetEmail(id);
             if (email == null)
             {
                 return NotFound($"Email with ID {id} not found.");
             }
 
-            emailRepository.DeleteEmail(id);
+            _emailLogic.DeleteEmail(id);
 
             return Ok();
         }
