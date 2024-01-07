@@ -1,3 +1,4 @@
+using pkaselj_lab_07_.Configuration;
 using pkaselj_lab_07_.Logic;
 using pkaselj_lab_07_.Repositories;
 
@@ -12,6 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IEmailLogic, EmailLogic>();
 builder.Services.AddSingleton<IEmailRepository, EmailRepository_SQL>();
+
+builder.Services.Configure<ValidationConfiguration>(builder.Configuration.GetSection("Validation"));
+builder.Services.Configure<DBConfiguration>(builder.Configuration.GetSection("Database"));
 
 var app = builder.Build();
 

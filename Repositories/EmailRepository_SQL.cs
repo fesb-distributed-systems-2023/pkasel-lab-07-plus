@@ -1,14 +1,21 @@
 ﻿// For the `using` line below to work, go to :
 // Tools > NuGet Package Manager > Manage NuGet Packages for Solution... > Browse > "Microsoft.Data.Sqlite" > Install 
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Options;
+using pkaselj_lab_07_.Configuration;
 using pkaselj_lab_07_.Models;
 
 namespace pkaselj_lab_07_.Repositories
 {
     public class EmailRepository_SQL : IEmailRepository
     {
-        private readonly string _connectionString = "Data Source=A:\\WebAPIDB\\Database.db";
+        private readonly string _connectionString;
         private readonly string _dbDatetimeFormat = "yyyy-MM-dd hh:mm:ss.fff";
+
+        public EmailRepository_SQL(IOptions<DBConfiguration> configuration)
+        {
+            _connectionString = configuration.Value.ConnectionString;
+        }
 
         public void AddEmail(Email email)
         {
