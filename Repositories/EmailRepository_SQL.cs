@@ -10,21 +10,47 @@ namespace pkaselj_lab_07_.Repositories
         private readonly string _connectionString = "Data Source=A:\\WebAPIDB\\Database.db";
         private readonly string _dbDatetimeFormat = "yyyy-MM-dd hh:mm:ss.fff";
 
+        private int GetIdFromEmailAddress(string? emailAddress)
+        {
+            if(emailAddress is null)
+            {
+                throw new ArgumentNullException($"Email address is null");
+            }
+
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT ID FROM Users WHERE EmailAddress == $email";
+
+            command.Parameters.AddWithValue("$email", emailAddress);
+
+            object? id = command.ExecuteScalar();
+
+            if (id is null)
+            {
+                throw new KeyNotFoundException($"No user with email address {emailAddress}");
+            }
+
+            return (int)id;
+        }
+
         public void AddEmail(Email email)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
+            int senderId = GetIdFromEmailAddress(email.Sender);
+
             var command = connection.CreateCommand();
             command.CommandText =
             @"
-                INSERT INTO Emails (Subject, Body, Sender, Receiver, Timestamp)
-                VALUES ($subject, $body, $sender, $receiver, $timestamp)";
+                INSERT INTO Emails (Subject, Body, Sender, Timestamp)
+                VALUES ($subject, $body, $senderId, $timestamp)";
 
             command.Parameters.AddWithValue("$subject", email.Subject);
             command.Parameters.AddWithValue("$body", email.Body);
-            command.Parameters.AddWithValue("$sender", email.Sender);
-            command.Parameters.AddWithValue("$receiver", email.Receiver);
+            command.Parameters.AddWithValue("$senderId", senderId);
             command.Parameters.AddWithValue("$timestamp", email.Timestamp.ToString(_dbDatetimeFormat));
 
             int rowsAffected = command.ExecuteNonQuery();

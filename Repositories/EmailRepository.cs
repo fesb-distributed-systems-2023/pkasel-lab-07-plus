@@ -38,7 +38,7 @@ namespace pkaselj_lab_07_.Repositories
                 existingEmail.Subject = updatedEmail.Subject;
                 existingEmail.Body = updatedEmail.Body;
                 existingEmail.Sender = updatedEmail.Sender;
-                existingEmail.Receiver = updatedEmail.Receiver;
+                existingEmail.Receivers = updatedEmail.Receivers;
             }
             else
             {
