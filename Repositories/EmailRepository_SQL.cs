@@ -2,6 +2,8 @@
 // Tools > NuGet Package Manager > Manage NuGet Packages for Solution... > Browse > "Microsoft.Data.Sqlite" > Install 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Options;
+using pkaselj_lab_07_.Configuration;
 using pkaselj_lab_07_.Models;
 using System.Linq;
 
@@ -9,10 +11,15 @@ namespace pkaselj_lab_07_.Repositories
 {
     public class EmailRepository_SQL : IEmailRepository
     {
-        private readonly string _connectionString = "Data Source=A:\\WebAPIDB\\Database.db.1";
+        private readonly string _connectionString;
         private readonly string _dbDatetimeFormat = "yyyy-MM-dd hh:mm:ss.fff";
 
-        private int GetIdFromEmailAddress(SqliteConnection connection, string? emailAddress)
+        public EmailRepository_SQL(IOptions<DBConfiguration> configuration)
+        {
+            _connectionString = configuration.Value.ConnectionString;
+        }
+
+        public void AddEmail(Email email)
         {
             if(emailAddress is null)
             {

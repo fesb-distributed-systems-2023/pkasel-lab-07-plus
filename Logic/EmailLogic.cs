@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using pkaselj_lab_07_.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using pkaselj_lab_07_.Exceptions;
 using pkaselj_lab_07_.Models;
 using pkaselj_lab_07_.Repositories;
@@ -10,14 +12,12 @@ namespace pkaselj_lab_07_.Logic
     public class EmailLogic : IEmailLogic
     {
         private readonly IEmailRepository _emailRepository;
-        private const int _bodyMaxCharacters = 100;
-        private const int _subjectMaxCharacters = 30;
-        private const int _emailMaxCharacters = 30;
-        private const string _emailRegex = @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$";
+        private readonly ValidationConfiguration _validationConfiguration;
 
-        public EmailLogic(IEmailRepository emailRepository)
+        public EmailLogic(IEmailRepository emailRepository, IOptions<ValidationConfiguration> configuration)
         {
             _emailRepository = emailRepository;
+            _validationConfiguration = configuration.Value;
         }
 
         private void ValidateSenderField(string? sender)
@@ -27,12 +27,12 @@ namespace pkaselj_lab_07_.Logic
                 throw new UserErrorMessage("Sender field cannot be empty.");
             }
 
-            if (sender.Length > _emailMaxCharacters)
+            if (sender.Length > _validationConfiguration.EmailMaxCharacters)
             {
-                throw new UserErrorMessage($"Sender field too long. Exceeded {_emailMaxCharacters} characters");
+                throw new UserErrorMessage($"Sender field too long. Exceeded {_validationConfiguration.EmailMaxCharacters} characters");
             }
 
-            if (!Regex.IsMatch(sender, _emailRegex))
+            if (!Regex.IsMatch(sender, _validationConfiguration.EmailRegex))
             {
                 throw new UserErrorMessage($"Email format invalid for sender '{sender}'");
             }
@@ -45,18 +45,18 @@ namespace pkaselj_lab_07_.Logic
                 throw new UserErrorMessage("Email subject cannot be empty.");
             }
 
-            if (subject.Length > _subjectMaxCharacters)
+            if (subject.Length > _validationConfiguration.SubjectMaxCharacters)
             {
-                throw new UserErrorMessage($"Subject field too long. Exceeded {_subjectMaxCharacters} characters");
+                throw new UserErrorMessage($"Subject field too long. Exceeded {_validationConfiguration.SubjectMaxCharacters} characters");
             }
 
         }
 
         private void ValidateBodyField(string? body)
         {
-            if (body is not null && body.Length > _bodyMaxCharacters)
+            if (body is not null && body.Length > _validationConfiguration.BodyMaxCharacters)
             {
-                throw new UserErrorMessage($"Body field too long. Exceeded {_bodyMaxCharacters} characters");
+                throw new UserErrorMessage($"Body field too long. Exceeded {_validationConfiguration.BodyMaxCharacters} characters");
             }
         }
 
@@ -80,12 +80,12 @@ namespace pkaselj_lab_07_.Logic
                 throw new UserErrorMessage("Receiver field cannot be empty.");
             }
 
-            if (receiver.Length > _emailMaxCharacters)
+            if (receiver.Length > _validationConfiguration.EmailMaxCharacters)
             {
-                throw new UserErrorMessage($"Receiver field too long. Exceeded {_emailMaxCharacters} characters");
+                throw new UserErrorMessage($"Receiver field too long. Exceeded {_validationConfiguration.EmailMaxCharacters} characters");
             }
 
-            if (!Regex.IsMatch(receiver, _emailRegex))
+            if (!Regex.IsMatch(receiver, _validationConfiguration.EmailRegex))
             {
                 throw new UserErrorMessage($"Email format invalid for receiver '{receiver}'");
             }
