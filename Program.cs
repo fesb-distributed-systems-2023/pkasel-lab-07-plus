@@ -1,3 +1,4 @@
+using pkaselj_lab_07_.Logic;
 using pkaselj_lab_07_.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<IEmailLogic, EmailLogic>();
 builder.Services.AddSingleton<IEmailRepository, EmailRepository_SQL>();
 
 var app = builder.Build();
