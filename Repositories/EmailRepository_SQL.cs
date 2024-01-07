@@ -40,24 +40,64 @@ namespace pkaselj_lab_07_.Repositories
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
-            int senderId = GetIdFromEmailAddress(email.Sender);
+            var transaction = connection.BeginTransaction();
 
-            var command = connection.CreateCommand();
-            command.CommandText =
+            // Translate sender email address to User ID
+            int senderId = -1;
+            try
+            {
+                senderId = GetIdFromEmailAddress(email.Sender);
+            }
+            catch
+            {
+                transaction.Rollback();
+            }
+
+            // Insert an email to the table
+            var commandInsertNewMail = connection.CreateCommand();
+            commandInsertNewMail.CommandText =
             @"
                 INSERT INTO Emails (Subject, Body, Sender, Timestamp)
-                VALUES ($subject, $body, $senderId, $timestamp)";
+                VALUES ($subject, $body, $senderId, $timestamp);
 
-            command.Parameters.AddWithValue("$subject", email.Subject);
-            command.Parameters.AddWithValue("$body", email.Body);
-            command.Parameters.AddWithValue("$senderId", senderId);
-            command.Parameters.AddWithValue("$timestamp", email.Timestamp.ToString(_dbDatetimeFormat));
+                SELECT last_insert_rowid();";
 
-            int rowsAffected = command.ExecuteNonQuery();
+            commandInsertNewMail.Parameters.AddWithValue("$subject", email.Subject);
+            commandInsertNewMail.Parameters.AddWithValue("$body", email.Body);
+            commandInsertNewMail.Parameters.AddWithValue("$senderId", senderId);
+            commandInsertNewMail.Parameters.AddWithValue("$timestamp", email.Timestamp.ToString(_dbDatetimeFormat));
 
-            if(rowsAffected < 1)
+            object? last_insert_rowid = commandInsertNewMail.ExecuteScalar();
+            if(last_insert_rowid is null)
             {
+                // Undo changes
+                transaction.Rollback();
                 throw new ArgumentException("Could not insert email into database.");
+            }
+
+            int emailId = (int)last_insert_rowid;
+
+            if (email.Receivers is null || email.Receivers.Count() == 0)
+            {
+                transaction.Rollback();
+                throw new ArgumentException("Mail has no receivers.");
+            }
+
+            // Add receivers one by one
+            var commandConnectMailToRecevier = connection.CreateCommand();
+            commandConnectMailToRecevier.CommandText = "INSERT INTO MailReceiverMap(MailID, ReceiverID) VALUES ($emailId, $receiverId)";
+            commandConnectMailToRecevier.Parameters.AddWithValue("$emailId", emailId);
+            try
+            {
+                foreach (var receiverEmail in email.Receivers)
+                {
+                    senderId = GetIdFromEmailAddress(receiverEmail);
+                    commandConnectMailToRecevier.Parameters.AddWithValue("$receiverId", receiverEmail);
+                }
+            }
+            catch
+            {
+                transaction.Rollback();
             }
         }
 
