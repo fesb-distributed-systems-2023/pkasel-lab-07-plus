@@ -11,6 +11,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IEmailRepository, EmailRepository_SQL>();
 
+builder.Services.AddCors(p => p.AddPolicy("cors_policy_allow_all", builder =>
+{
+    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,6 +26,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
+
+app.UseCors("cors_policy_allow_all");
 
 app.MapControllers();
 
