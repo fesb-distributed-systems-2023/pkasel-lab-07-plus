@@ -10,47 +10,64 @@ namespace pkaselj_lab_07_.Repositories
         private readonly string _connectionString = "Data Source=A:\\WebAPIDB\\Database.db.1";
         private readonly string _dbDatetimeFormat = "yyyy-MM-dd hh:mm:ss.fff";
 
-        private int GetIdFromEmailAddress(string? emailAddress)
+        private int GetIdFromEmailAddress(SqliteConnection connection, string? emailAddress)
         {
             if(emailAddress is null)
             {
                 throw new ArgumentNullException($"Email address is null");
             }
 
-            using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText = "SELECT ID FROM Users WHERE EmailAddress == $email";
-
             command.Parameters.AddWithValue("$email", emailAddress);
-
             object? id = command.ExecuteScalar();
+
+            // User with email exists. Return his/her ID
+            if (id is not null)
+            {
+                return (Int32)(Int64)id;
+            }
+
+            // User doesn't exist, create a new one and return ID
+            var command_2 = connection.CreateCommand();
+            command_2.CommandText = "INSERT INTO Users(EmailAddress) VALUES ($email); SELECT last_insert_rowid();";
+            command_2.Parameters.AddWithValue("$email", emailAddress);
+            id = command_2.ExecuteScalar();
 
             if (id is null)
             {
-                throw new KeyNotFoundException($"No user with email address {emailAddress}");
+                // Insert failed...
+                throw new KeyNotFoundException($"Could not insert {emailAddress}.");
             }
 
-            return (int)id;
+            return (Int32)(Int64)id;
         }
 
         public void AddEmail(Email email)
         {
+            // First, connect to a database
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
+            // Start a transaction. Everything done to the database from now on,
+            // will not be applied until transaction.Commit() is called.
+            // If we encounter an error, transaction.Rollback() will reset all
+            // changes applied after this line.
             var transaction = connection.BeginTransaction();
 
-            // Translate sender email address to User ID
+            // Get User ID from sender email
             int senderId = -1;
             try
             {
-                senderId = GetIdFromEmailAddress(email.Sender);
+                senderId = GetIdFromEmailAddress(connection, email.Sender);
             }
-            catch
+            catch (Exception ex)
             {
+                // In case of error, write message to the Console,
+                // rollback all changes and exit this function
+                Console.WriteLine($"Error: {ex.Message}");
                 transaction.Rollback();
+                return;
             }
 
             // Insert an email to the table
@@ -67,16 +84,19 @@ namespace pkaselj_lab_07_.Repositories
             commandInsertNewMail.Parameters.AddWithValue("$senderId", senderId);
             commandInsertNewMail.Parameters.AddWithValue("$timestamp", email.Timestamp.ToString(_dbDatetimeFormat));
 
+            // Take the ID of the last inserted row
             object? last_insert_rowid = commandInsertNewMail.ExecuteScalar();
             if(last_insert_rowid is null)
             {
-                // Undo changes
+                // There was an error, no row was inserted.
+                // In that case, rollback/undo all changes and throw an error.
                 transaction.Rollback();
                 throw new ArgumentException("Could not insert email into database.");
             }
 
-            int emailId = (int)last_insert_rowid;
+            Int64 emailId = (Int64)last_insert_rowid;
 
+            // Cannot send an email to nobody
             if (email.Receivers is null || email.Receivers.Count() == 0)
             {
                 transaction.Rollback();
@@ -87,19 +107,25 @@ namespace pkaselj_lab_07_.Repositories
             var commandConnectMailToRecevier = connection.CreateCommand();
             commandConnectMailToRecevier.CommandText = "INSERT INTO MailReceiverMap(MailID, ReceiverID) VALUES ($emailId, $receiverId)";
             commandConnectMailToRecevier.Parameters.AddWithValue("$emailId", emailId);
+            commandConnectMailToRecevier.Parameters.AddWithValue("$receiverId", null);
             try
             {
                 foreach (var receiverEmail in email.Receivers)
                 {
-                    senderId = GetIdFromEmailAddress(receiverEmail);
-                    commandConnectMailToRecevier.Parameters.AddWithValue("$receiverId", receiverEmail);
+                    int receiverId = GetIdFromEmailAddress(connection, receiverEmail);
+                    commandConnectMailToRecevier.Parameters["$receiverId"].Value = receiverId;
                     _ = commandConnectMailToRecevier.ExecuteNonQuery();
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine($"Error: {ex.Message}");
                 transaction.Rollback();
             }
+
+            // Apply all changes to the database
+            transaction.Commit();
+            connection.Close();
         }
 
         public void DeleteEmail(int id)
