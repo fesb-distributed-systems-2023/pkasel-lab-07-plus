@@ -1,7 +1,9 @@
 ﻿// For the `using` line below to work, go to :
 // Tools > NuGet Package Manager > Manage NuGet Packages for Solution... > Browse > "Microsoft.Data.Sqlite" > Install 
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using pkaselj_lab_07_.Models;
+using System.Linq;
 
 namespace pkaselj_lab_07_.Repositories
 {
@@ -151,34 +153,56 @@ namespace pkaselj_lab_07_.Repositories
 
         public List<Email> GetAllEmails()
         {
-            //using var connection = new SqliteConnection(_connectionString);
-            //connection.Open();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
 
-            //var command = connection.CreateCommand();
-            //command.CommandText =
-            //@"SELECT ID, Subject, Body, Sender, Receiver, Timestamp FROM Emails";
+            var commandDistinctEmails = connection.CreateCommand();
+            commandDistinctEmails.CommandText = @"
+                SELECT Emails.ID, EmailAddress AS Sender, Subject, Body, Timestamp FROM Emails
+                INNER JOIN Users ON Emails.SenderID == Users.ID";
 
-            //using var reader = command.ExecuteReader();
+            using var reader = commandDistinctEmails.ExecuteReader();
 
-            //var results = new List<Email>();
-            //while(reader.Read())
-            //{
+            // Get a list of all email. Read all fields except receiver list.
+            var lstEmails = new List<Email>();
+            while (reader.Read())
+            {
+                var email = new Email
+                {
+                    ID = reader.GetInt32(0),
+                    Sender = reader.GetString(1),
+                    Subject = reader.GetString(2),
+                    Body = reader.GetString(3),
+                    Timestamp = DateTime.Parse(reader.GetString(4), null),
+                    Receivers = null
+                };
 
-            //    var row = new Email
-            //    {
-            //        ID = reader.GetInt32(0),
-            //        Subject = reader.GetString(1),
-            //        Body = reader.GetString(2),
-            //        Sender = reader.GetString(3),
-            //        Receiver = reader.GetString(4),
-            //        Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
-            //    };
+                lstEmails.Add(email);
+            }
 
-            //    results.Add(row);
-            //}
+            var commandListReceivers = connection.CreateCommand();
+            commandListReceivers.CommandText = @"
+                SELECT EmailAddress FROM Users
+                INNER JOIN MailReceiverMap ON Users.ID == MailReceiverMap.ReceiverID
+                WHERE MailReceiverMap.MailID == $emailId;";
+            commandListReceivers.Parameters.AddWithValue("$emailId", null);
 
-            //return results;
-            return new List<Email> { };
+            foreach (var email in lstEmails)
+            {
+                commandListReceivers.Parameters["$emailId"].Value = email.ID;
+                using var receiverReader = commandListReceivers.ExecuteReader();
+                var receivers = new List<string>(); 
+                while(receiverReader.Read())
+                {
+                    receivers.Add(receiverReader.GetString(0));
+                }
+                email.Receivers = receivers;
+                reader.Close();
+            }
+
+            connection.Close();
+
+            return lstEmails;
         }
 
         public Email? GetEmailById(int id)
