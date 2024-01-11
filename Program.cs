@@ -14,6 +14,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IEmailLogic, EmailLogic>();
 builder.Services.AddSingleton<IEmailRepository, EmailRepository_SQL>();
 
+builder.Services.AddCors(p => p.AddPolicy("cors_policy_allow_all", builder =>
+{
+    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
+
 builder.Services.Configure<ValidationConfiguration>(builder.Configuration.GetSection("Validation"));
 builder.Services.Configure<DBConfiguration>(builder.Configuration.GetSection("Database"));
 
@@ -27,6 +32,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
+
+app.UseCors("cors_policy_allow_all");
 
 app.MapControllers();
 
