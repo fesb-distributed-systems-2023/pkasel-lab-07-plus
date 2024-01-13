@@ -1,4 +1,5 @@
-﻿using pkaselj_lab_07_.Exceptions;
+﻿using Microsoft.IdentityModel.Tokens;
+using pkaselj_lab_07_.Exceptions;
 using pkaselj_lab_07_.Models;
 using pkaselj_lab_07_.Repositories;
 using System.Reflection;
@@ -59,6 +60,19 @@ namespace pkaselj_lab_07_.Logic
             }
         }
 
+        private void ValidateReceiverListField(IEnumerable<string>? lstReceivers)
+        {
+            if(lstReceivers.IsNullOrEmpty())
+            {
+                throw new UserErrorMessage("Receiver field cannot be empty!");
+            }
+
+            foreach (var item in lstReceivers)
+            {
+                ValidateReceiverField(item);
+            }
+        }
+
         private void ValidateReceiverField(string? receiver)
         {
             if (receiver is null)
@@ -98,7 +112,7 @@ namespace pkaselj_lab_07_.Logic
             ValidateSubjectField(email.Subject);
             ValidateBodyField(email.Body);
             ValidateSenderField(email.Sender);
-            ValidateReceiverField(email.Receiver);
+            ValidateReceiverListField(email.Receivers);
 
             // All fields validated, continue...
 
@@ -129,7 +143,7 @@ namespace pkaselj_lab_07_.Logic
             ValidateSubjectField(email.Subject);
             ValidateBodyField(email.Body);
             ValidateSenderField(email.Sender);
-            ValidateReceiverField(email.Receiver);
+            ValidateReceiverListField(email.Receivers);
 
             // All fields validated, continue...
 
