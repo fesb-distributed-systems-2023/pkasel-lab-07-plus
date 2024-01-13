@@ -19,7 +19,7 @@ namespace pkaselj_lab_07_.Repositories
             _connectionString = configuration.Value.ConnectionString;
         }
 
-        public void AddEmail(Email email)
+        public int GetIdFromEmailAddress(SqliteConnection connection, string? emailAddress)
         {
             if(emailAddress is null)
             {
