@@ -1,6 +1,6 @@
-﻿using pkaselj_lab_07_.Models;
+﻿using EasyMailCoreApplication.Models;
 
-namespace pkaselj_lab_07_.Logic
+namespace EasyMailCoreApplication.Logic
 {
     public interface IEmailLogic
     {

@@ -1,6 +1,6 @@
-﻿using pkaselj_lab_07_.Models;
+﻿using EasyMailCoreApplication.Models;
 
-namespace pkaselj_lab_07_.Controllers.DTO
+namespace WebAPI.Controllers.DTO
 {
     public class NewEmailDTO
     {

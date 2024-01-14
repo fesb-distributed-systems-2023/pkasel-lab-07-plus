@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using pkaselj_lab_07_.Controllers.DTO;
-using pkaselj_lab_07_.Filters;
-using pkaselj_lab_07_.Logic;
-using pkaselj_lab_07_.Models;
-using pkaselj_lab_07_.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using WebAPI.Controllers.DTO;
+using WebAPI.Filters;
+using EasyMailCoreApplication.Logic;
 
-namespace pkaselj_lab_07_.Controllers
+namespace WebAPI.Controllers
 {
 
     [LogFilter]

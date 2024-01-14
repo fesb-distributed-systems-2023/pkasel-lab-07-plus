@@ -1,13 +1,12 @@
 ﻿// For the `using` line below to work, go to :
 // Tools > NuGet Package Manager > Manage NuGet Packages for Solution... > Browse > "Microsoft.Data.Sqlite" > Install 
-using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Options;
-using pkaselj_lab_07_.Configuration;
-using pkaselj_lab_07_.Models;
+using EasyMailCoreApplication.Configuration;
+using EasyMailCoreApplication.Models;
 using System.Linq;
 
-namespace pkaselj_lab_07_.Repositories
+namespace EasyMailCoreApplication.Repositories
 {
     public class EmailRepository_SQL : IEmailRepository
     {

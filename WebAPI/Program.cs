@@ -1,6 +1,6 @@
-using pkaselj_lab_07_.Configuration;
-using pkaselj_lab_07_.Logic;
-using pkaselj_lab_07_.Repositories;
+using EasyMailCoreApplication.Configuration;
+using EasyMailCoreApplication.Logic;
+using EasyMailCoreApplication.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

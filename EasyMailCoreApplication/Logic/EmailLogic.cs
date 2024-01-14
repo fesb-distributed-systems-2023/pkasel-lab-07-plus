@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
-using pkaselj_lab_07_.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using pkaselj_lab_07_.Exceptions;
-using pkaselj_lab_07_.Models;
-using pkaselj_lab_07_.Repositories;
-using System.Reflection;
+using EasyMailCoreApplication.Configuration;
+using EasyMailCoreApplication.Exceptions;
+using EasyMailCoreApplication.Models;
+using EasyMailCoreApplication.Repositories;
 using System.Text.RegularExpressions;
 
-namespace pkaselj_lab_07_.Logic
+namespace EasyMailCoreApplication.Logic
 {
     public class EmailLogic : IEmailLogic
     {
@@ -62,7 +60,7 @@ namespace pkaselj_lab_07_.Logic
 
         private void ValidateReceiverListField(IEnumerable<string>? lstReceivers)
         {
-            if(lstReceivers.IsNullOrEmpty())
+            if(lstReceivers is null || lstReceivers.Count() == 0)
             {
                 throw new UserErrorMessage("Receiver field cannot be empty!");
             }

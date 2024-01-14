@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using pkaselj_lab_07_.Exceptions;
+using EasyMailCoreApplication.Exceptions;
 using System.Net;
 
-namespace pkaselj_lab_07_.Filters
+namespace WebAPI.Filters
 {
     public class LogFilter : ActionFilterAttribute
     {

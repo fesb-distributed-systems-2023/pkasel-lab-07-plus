@@ -1,4 +1,4 @@
-﻿namespace pkaselj_lab_07_.Configuration
+﻿namespace EasyMailCoreApplication.Configuration
 {
     public class DBConfiguration
     {

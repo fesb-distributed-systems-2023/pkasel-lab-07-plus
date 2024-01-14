@@ -1,4 +1,4 @@
-﻿namespace pkaselj_lab_07_.Models
+﻿namespace EasyMailCoreApplication.Models
 {
     public class Email
     {

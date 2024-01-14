@@ -1,4 +1,4 @@
-﻿namespace pkaselj_lab_07_.Exceptions
+﻿namespace EasyMailCoreApplication.Exceptions
 {
     // A type of exception that will be passed to the user
     public class UserErrorMessage : Exception

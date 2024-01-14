@@ -1,6 +1,6 @@
-﻿using pkaselj_lab_07_.Models;
+﻿using EasyMailCoreApplication.Models;
 
-namespace pkaselj_lab_07_.Repositories
+namespace EasyMailCoreApplication.Repositories
 {
     // Right click on class name (EmailRepository) > Quick Actions and Refactorings > Extract Interface
     public class EmailRepository : IEmailRepository
