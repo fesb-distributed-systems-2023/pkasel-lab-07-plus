@@ -4,11 +4,10 @@ option csharp_namespace = "gRPC_API";
 
 package emails;
 
-syntax = "proto3";
 
 // Services
 
-service EmailsService {
+service EmailHandler {
   rpc GetEmails (GetEmailsRequest) returns (GetEmailsResponse);
   
   rpc CreateEmail (CreateEmailRequest) returns (CreateEmailResponse);
@@ -20,16 +19,16 @@ message EmailInputType {
     string subject = 1;
     string body = 2;
     string sender = 3;
-    repeated string receiver = 4;
+    repeated string receivers = 4;
 }
 
 message EmailOutputType {
     int32 id = 1;
     string subject = 2;
     string body = 3;
-    string timestamp = 3;
-    string sender = 4;
-    repeated string receiver = 5;
+    string timestamp = 4;
+    string sender = 5;
+    repeated string receivers = 6;
 }
 
 // Complex Types
@@ -37,7 +36,7 @@ message EmailOutputType {
 message GetEmailsRequest { }
 
 message GetEmailsResponse {
-    repeating EmailOutputType emails = 1;
+    repeated EmailOutputType emails = 1;
 }
 
 message CreateEmailRequest {
