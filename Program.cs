@@ -12,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IEmailLogic, EmailLogic>();
-builder.Services.AddSingleton<IEmailRepository, EmailRepository_SQL>();
+builder.Services.AddSingleton<IEmailRepository, EmailRepository_MSSQL>();
 
 builder.Services.Configure<ValidationConfiguration>(builder.Configuration.GetSection("Validation"));
 builder.Services.Configure<DBConfiguration>(builder.Configuration.GetSection("Database"));

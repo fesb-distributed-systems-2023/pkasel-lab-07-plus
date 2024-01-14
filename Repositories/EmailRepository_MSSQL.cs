@@ -35,6 +35,17 @@ namespace pkaselj_lab_07_.Repositories
 
             string receiverList = string.Join(';', email.Receivers ?? Array.Empty<string>());
 
+            command.Parameters.AddWithValue("@Subject",         email.Subject);
+            command.Parameters.AddWithValue("@Body",            email.Body);
+            command.Parameters.AddWithValue("@Timestamp_",      email.Timestamp.ToString(_dbDatetimeFormat));
+            command.Parameters.AddWithValue("@Sender",          email.Sender);
+            command.Parameters.AddWithValue("@ReceiverList",    receiverList);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+
+            return;
         }
 
         public void DeleteEmail(int id)
@@ -44,7 +55,42 @@ namespace pkaselj_lab_07_.Repositories
 
         public List<Email> GetAllEmails()
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand("[dbo].[GetAllEmails]", connection);
+
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+
+            var lstEmails = new List<Email>();
+
+            while (reader.Read())
+            {
+                var emailID = reader.GetInt32(0);
+
+                Email? email = lstEmails.Where(x => x.ID == emailID).FirstOrDefault();
+                if (email is null)
+                { // Email does not exist, read all fields
+                    email = new Email
+                    {
+                        ID = emailID,
+                        Sender = reader.GetString(1),
+                        Subject = reader.GetString(2),
+                        Body = reader.GetString(3),
+                        Timestamp = DateTime.ParseExact(reader.GetString(4), _dbDatetimeFormat, null),
+                        Receivers = new List<string> { reader.GetString(5) }
+                    };
+                    lstEmails.Add(email);
+                }
+                else
+                { // Email alread exists, read only receiver
+                    email.Receivers = email.Receivers!.Concat( new [] { reader.GetString(5) });
+                }
+            }
+
+            connection.Close();
+            return lstEmails;
         }
 
         public Email? GetEmailById(int id)
